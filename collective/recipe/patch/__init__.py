@@ -33,6 +33,7 @@ class Recipe(object):
         self.options['executable'] = self.buildout[self.options['python']]['executable']
         self.options['eggs-directory'] = buildout['buildout']['eggs-directory']
         self.options['develop-eggs-directory'] = buildout['buildout']['develop-eggs-directory']
+        self.options['patch-cache'] = options.get("patch-cache", ".patch_cache.txt")
 
     def install(self):
         """Installer"""
@@ -124,6 +125,10 @@ class Recipe(object):
                 raise zc.buildout.UserError('could not apply %s' % patch)
         finally:
             os.chdir(cwd)
+
+        if self.options.get("no-uninstall"):
+            self.log_patch_entry(path)
+            return ""
         return path
 
     def use_patch_library(self, path, patch):
@@ -135,4 +140,13 @@ class Recipe(object):
         logger.info('in %s...' % path)
         if not patchlib.apply_patch(patch):
             raise zc.buildout.UserError('could not apply %s' % name)
+        elif self.options.get("no-uninstall"):
+            self.log_patch_entry(path)
+            return ""
         return path
+
+    def log_patch_entry(self, path):
+        """log the patched path to $patch-cache"""
+        cachefilename = self.options.get("patch-cache")
+        with open(cachefilename, "a") as cachefile:
+            cachefile.write(path + "\n")

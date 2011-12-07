@@ -22,6 +22,13 @@ patches
         patches = patches/my_very_sprecial.patch
                   patches/another_loverly.patch
 
+no-uninstall
+    If set, patched paths will not be reported to buildout. This way,
+    the recipe can be used to patch code not installed by buildout.
+    A log of paths is kept in .patch-cache.txt (the filename can be
+    changed via 'patch-cache' option).
+
+
 Example usage
 =============
 
